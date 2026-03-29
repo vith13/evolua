@@ -5,13 +5,24 @@
     <title>Evolua - Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="logo">e</div>
+
+ <nav class="menu">
+    
+    <a href="#">Principal</a>
+    <a href="#">Serviços</a>
+    <a href="#">Sobre</a>
+    <a href="#">Entrar</a>
+ </nav>
+
 
 <div class="login-container">
     <h2>Bem-vindo de volta!</h2>
 
-<form>
+<form action="/dashboard" method="GET">
     <input type="email" placeholder="Email">
     <input type="password" placeholder="Senha">
 

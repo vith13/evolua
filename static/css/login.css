@@ -118,14 +118,14 @@ button:hover {
 
 .logo {
     position: absolute;
-    top: 5px;
+    top: 15px;
     left: 20px;
 
     font-family: 'Quicksand', sans-serif;
     font-size: 60px;
     font-weight: 500;
 
-    color: #1f4e5f; /* azul do seu projeto */
+    color: #1f4e5f; 
 }
 
 .menu {

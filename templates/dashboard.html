@@ -3,10 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - Evolua</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-<h1>aqui vai ser o Dashboard</h1>
+<div class="dashboard">
+    <div class="sidebar">
+          <!-- PERFIL -->
+    <div class="perfil">
+        <div class="avatar"></div>
+        <h3>Emily</h3>
+        <p>emily@gmail.com</p>
+    </div>
+
+    <!-- MENU -->
+   <ul class="menu-lateral">
+    <li><i data-lucide="home"></i> Início</li>
+    <li><i data-lucide="check-square"></i> Tarefas</li>
+    <li><i data-lucide="book"></i> Disciplinas</li>
+    <li><i data-lucide="clock"></i> Sessões</li>
+    <li><i data-lucide="target"></i> Modo foco</li>
+    <li><i data-lucide="bar-chart"></i> Relatório</li>
+    <li><i data-lucide="cloud"></i> Backup</li>
+    <li><i data-lucide="settings"></i> Configurações</li>
+</ul>
+
+    <!-- SAIR -->
+    <div class="logout">
+    <i data-lucide="log-out"></i>
+    <span>Sair</span>
+</div>
+
+
+
+
+
+    </div>
+    <div class="main">
+
+       <div class="topbar">
+        <h2>Bem-vinda, Emily!</h2>
+
+        <input type="text" placeholder="Pesquisar">
+       </div>
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+
 
 </body>
 </html>

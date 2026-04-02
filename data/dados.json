@@ -1,0 +1,15 @@
+{
+    "disciplinas": [
+        {
+            "nome": "Matem\u00e1tica"
+        }
+    ],
+    "sessoes": [
+        {
+            "disciplina": "Matem\u00e1tica",
+            "duracao": 60,
+            "data": "2026-04-01"
+        }
+    ],
+    "tarefas": []
+}

@@ -1,0 +1,131 @@
+/*TELA INICIAL DASHBOARD*/
+
+
+body {
+    margin: 0;
+    font-family: 'League Spartan', sans-serif;
+    background: #B6D5E4; 
+}
+
+
+.dashboard {
+    display: flex;
+    height: 100vh;
+    width: 100%
+}
+
+/*----------SIDEBAR-------------------*/
+
+/*BACKGROUND*/
+.sidebar {
+    width: 280px;
+    background: #093952; 
+    color: white;
+    padding: 20px;
+    
+}
+
+
+.avatar {
+    width: 150px;
+    height: 150px;
+    background: #ffffff33;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+}
+
+
+.perfil {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+
+.menu-lateral li {
+   display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%; 
+    padding: 15px 15px;
+
+    border-radius: 8px;
+    cursor: pointer;
+
+    font-weight: 300;
+    transition: 0.2s;
+}
+
+.menu-lateral i {
+    width: 20px;
+    height: 20px;
+}
+
+.menu-lateral li:hover {
+    background: #B6D5E4; 
+    font-weight: 700;
+}
+
+
+
+.logout {
+    margin-top: 20px;
+
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    gap: 8px;
+
+    cursor: pointer;
+    font-weight: 300;
+}
+
+.logout i {
+    width: 15px;
+    height: 15px;
+}
+
+.logout:hover {
+    font-weight: 700;
+}
+
+
+
+.main {
+    flex: 0px;
+    padding: 1px;
+}
+
+/*--------BARRA DE CIMA----------------*/
+
+.topbar {
+    background: white;
+    border-radius: 2px;
+
+    padding: 15px 40px;
+
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h2 {
+    margin: 0;
+    font-weight: 700;
+    color: #093952;
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 500;
+}
+
+.topbar input {
+    border: none;
+    outline: none;
+
+    background: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 8px;
+
+    font-family: 'League Spartan', sans-serif;
+   
+}

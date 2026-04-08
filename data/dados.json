@@ -2,6 +2,9 @@
     "disciplinas": [
         {
             "nome": "Matem\u00e1tica"
+        },
+        {
+            "nome": "calculo"
         }
     ],
     "sessoes": [
@@ -9,7 +12,17 @@
             "disciplina": "Matem\u00e1tica",
             "duracao": 60,
             "data": "2026-04-01"
+        },
+        {
+            "disciplina": "calculo",
+            "duracao": 1,
+            "data": "2026-04-07"
         }
     ],
-    "tarefas": []
+    "tarefas": [
+        {
+            "tarefa": "estudar",
+            "concluida": false
+        }
+    ]
 }

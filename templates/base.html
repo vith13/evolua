@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block titulo %}Evolua{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    {% block estilos %}{% endblock %}
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="perfil">
+            <div class="avatar"></div>
+            <h3>Emilly</h3>
+            <p>emily@gmail.com</p>
+        </div>
+
+        <ul class="menu-lateral">
+            <li class="{{ 'ativo' if pagina_ativa == 'dashboard' }}" onclick="location.href='/dashboard'"><i data-lucide="home"></i> Início</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'tarefas' }}" onclick="location.href='/tarefas'"><i data-lucide="check-square"></i> Tarefas</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'disciplinas' }}" onclick="location.href='/disciplinas'"><i data-lucide="book"></i> Disciplinas</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'sessoes' }}" onclick="location.href='/sessoes'"><i data-lucide="clock"></i> Sessões</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'foco' }}" onclick="location.href='/foco'"><i data-lucide="target"></i> Modo foco</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'relatorio' }}" onclick="location.href='/relatorio'"><i data-lucide="bar-chart"></i> Relatório</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'backup' }}" onclick="location.href='/backup'"><i data-lucide="cloud"></i> Backup</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'configuracoes' }}" onclick="location.href='/configuracoes'"><i data-lucide="settings"></i> Configurações</li>
+        </ul>
+
+        <div class="logout">
+            <i data-lucide="log-out"></i>
+            <span>Sair</span>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main {% block classe_main %}{% endblock %}">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <h2>{% block topbar_titulo %}evolua{% endblock %}</h2>
+            <input type="text" placeholder="Pesquisar">
+        </div>
+
+        <!-- CONTEÚDO DA TELA -->
+        {% block conteudo %}{% endblock %}
+
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

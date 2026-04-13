@@ -47,7 +47,7 @@ body {
     gap: 10px;
 
     width: 100%; 
-    padding: 15px 15px;
+    padding: 14px 15px;
 
     border-radius: 8px;
     cursor: pointer;
@@ -64,6 +64,14 @@ body {
 .menu-lateral li:hover {
     background: #B6D5E4; 
     font-weight: 700;
+    padding: 6px 15px;
+}
+
+.menu-lateral li.ativo {
+    background: #B6D5E4;
+    color: #093952;
+    font-weight: 700;
+    padding: 6px 15px;
 }
 
 
@@ -116,6 +124,7 @@ body {
     color: #093952;
     font-family: 'League Spartan', sans-serif;
     font-weight: 500;
+    font-size: 45px;
 }
 
 .topbar input {
@@ -123,7 +132,7 @@ body {
     outline: none;
 
     background: #f0f0f0;
-    padding: 8px 12px;
+    padding: 8px 20px;
     border-radius: 8px;
 
     font-family: 'League Spartan', sans-serif;

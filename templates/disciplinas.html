@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block titulo %}Disciplinas - Evolua{% endblock %}
+{% block estilos %}<link rel="stylesheet" href="{{ url_for('static', filename='css/disciplinas.css') }}">{% endblock %}
+{% block classe_main %}disciplinas-main{% endblock %}
+
+{% block conteudo %}
+
+    <!-- HEADER -->
+    <div class="disciplinas-header">
+        <span>Disciplinas</span>
+        <button class="btn-nova-disciplina" onclick="abrirModal()">
+            <i data-lucide="plus"></i>
+        </button>
+    </div>
+
+    <!-- GRID DE DISCIPLINAS -->
+    <div class="disciplinas-conteudo">
+        <div class="disciplinas-grid" id="disciplinas-grid"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal" style="display:none">
+        <div class="modal">
+            <h3 id="modal-titulo">Nova disciplina</h3>
+            <input type="text" id="input-disciplina" placeholder="Nome da disciplina...">
+            <div class="modal-botoes">
+                <button onclick="fecharModal()">Cancelar</button>
+                <button class="btn-confirmar" onclick="salvarDisciplina()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let disciplinas = JSON.parse(localStorage.getItem('disciplinas')) || [];
+    let editandoIndex = null;
+
+    function salvar() {
+        localStorage.setItem('disciplinas', JSON.stringify(disciplinas));
+    }
+
+    function renderizar() {
+        const grid = document.getElementById('disciplinas-grid');
+        grid.innerHTML = '';
+
+        if (disciplinas.length === 0) {
+            grid.innerHTML = '<p class="vazio">Nenhuma disciplina cadastrada.</p>';
+            return;
+        }
+
+        disciplinas.forEach((disciplina, index) => {
+            const card = document.createElement('div');
+            card.className = 'disciplina-card';
+            card.innerHTML = `
+                <div class="disciplina-nome">${disciplina.nome}</div>
+                <div class="disciplina-acoes">
+                    <button class="btn-editar" onclick="abrirEdicao(${index})">
+                        <i data-lucide="pencil"></i>
+                    </button>
+                    <button class="btn-excluir" onclick="excluirDisciplina(${index})">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        lucide.createIcons();
+    }
+
+    function abrirModal() {
+        editandoIndex = null;
+        document.getElementById('modal-titulo').textContent = 'Nova disciplina';
+        document.getElementById('input-disciplina').value = '';
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('input-disciplina').focus();
+    }
+
+    function abrirEdicao(index) {
+        editandoIndex = index;
+        document.getElementById('modal-titulo').textContent = 'Editar disciplina';
+        document.getElementById('input-disciplina').value = disciplinas[index].nome;
+        document.getElementById('modal').style.display = 'flex';
+        document.getElementById('input-disciplina').focus();
+    }
+
+    function fecharModal() {
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('input-disciplina').value = '';
+        editandoIndex = null;
+    }
+
+    function salvarDisciplina() {
+        const input = document.getElementById('input-disciplina');
+        const nome = input.value.trim();
+        if (!nome) return;
+
+        if (editandoIndex !== null) {
+            disciplinas[editandoIndex].nome = nome;
+        } else {
+            disciplinas.push({ nome });
+        }
+
+        salvar();
+        fecharModal();
+        renderizar();
+    }
+
+    function excluirDisciplina(index) {
+        disciplinas.splice(index, 1);
+        salvar();
+        renderizar();
+    }
+
+    document.getElementById('input-disciplina').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') salvarDisciplina();
+    });
+
+    renderizar();
+    </script>
+{% endblock %}

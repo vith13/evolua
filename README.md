@@ -9,12 +9,16 @@ O **Evolua** é uma aplicação web minimalista para gestão de estudos, desenvo
 ## ✨ Funcionalidades
 
 - ✅ Interface 100% em português
+- 🏠 Dashboard com visão geral, gráfico de disciplinas, tarefas, modo foco e calendário
 - 📋 Gerenciamento de tarefas (adicionar, concluir, excluir e filtrar)
-- 📖 Cadastro de disciplinas (criar, editar e excluir)
+- 📖 Cadastro de disciplinas com cores personalizadas (criar, editar e excluir)
 - ⏱️ Registro de sessões de estudo por disciplina
-- 🎯 Modo foco *(em desenvolvimento)*
-- 📊 Relatório semanal *(em desenvolvimento)*
-- ☁️ Backup manual dos dados *(em desenvolvimento)*
+- 🎯 Modo foco com timer, Pomodoro e salvamento automático de sessão
+- 📊 Relatório de horas estudadas com gráfico e filtros por dia, semana e mês
+- 📅 Calendário com compromissos e sessões de estudo por disciplina
+- 🔍 Barra de pesquisa global (tarefas, disciplinas, sessões e compromissos)
+- ☁️ Backup manual — exportar e importar dados em JSON
+- ⚙️ Configurações de perfil, dados e conta
 
 ---
 
@@ -25,6 +29,7 @@ O **Evolua** é uma aplicação web minimalista para gestão de estudos, desenvo
 - **JavaScript** — interatividade do front-end
 - **Jinja2** — templates HTML com herança (`base.html`)
 - **Lucide Icons** — ícones
+- **Chart.js** — gráficos de relatório e dashboard
 - **LocalStorage** — persistência temporária dos dados (front-end)
 
 ---
@@ -43,19 +48,30 @@ projeto_software/
 ├── static/
 │   ├── css/
 │   │   ├── dashboard.css
+│   │   ├── dashboard_page.css
 │   │   ├── tarefas.css
 │   │   ├── disciplinas.css
 │   │   ├── sessoes.css
+│   │   ├── foco.css
+│   │   ├── relatorio.css
+│   │   ├── calendario.css
+│   │   ├── configuracoes.css
 │   │   └── login.css
 │   └── img/
 │
 ├── templates/
 │   ├── base.html
 │   ├── login.html
+│   ├── cadastro.html
+│   ├── esqueci-senha.html
 │   ├── dashboard.html
 │   ├── tarefas.html
 │   ├── disciplinas.html
-│   └── sessoes.html
+│   ├── sessoes.html
+│   ├── foco.html
+│   ├── relatorio.html
+│   ├── calendario.html
+│   └── configuracoes.html
 │
 ├── app.py
 ├── backend.py
@@ -112,14 +128,30 @@ http://127.0.0.1:5000
 | Rota | Descrição |
 |---|---|
 | `/` | Tela de login |
+| `/cadastro` | Cadastro de novo usuário |
+| `/esqueci-senha` | Redefinição de senha |
 | `/dashboard` | Painel principal |
 | `/tarefas` | Gerenciamento de tarefas |
 | `/disciplinas` | Cadastro de disciplinas |
 | `/sessoes` | Registro de sessões de estudo |
+| `/foco` | Modo foco com timer |
+| `/relatorio` | Relatório de horas estudadas |
+| `/calendario` | Calendário com compromissos |
+| `/configuracoes` | Configurações da conta |
+
+---
+
+## 🔮 Melhorias futuras
+
+- 🌙 Tema escuro
+- 📱 Versão responsiva para celular
+- 🔔 Notificações de lembrete de estudo
+- 📅 Integração com Google Calendar
+- 🌐 Lançamento como SaaS com planos e autenticação real
 
 ---
 
 ## 👩‍💻 Autora
 
 **Emilly Vitória Santana Alves**  
-O projeto está sendo desenvolvido para a disciplina de Projeto de Software.
+Projeto desenvolvido para a disciplina de Projeto de Software.

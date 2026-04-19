@@ -27,11 +27,11 @@
             <li class="{{ 'ativo' if pagina_ativa == 'sessoes' }}" onclick="location.href='/sessoes'"><i data-lucide="clock"></i> Sessões</li>
             <li class="{{ 'ativo' if pagina_ativa == 'foco' }}" onclick="location.href='/foco'"><i data-lucide="target"></i> Modo foco</li>
             <li class="{{ 'ativo' if pagina_ativa == 'relatorio' }}" onclick="location.href='/relatorio'"><i data-lucide="bar-chart"></i> Relatório</li>
-            <li class="{{ 'ativo' if pagina_ativa == 'backup' }}" onclick="location.href='/backup'"><i data-lucide="cloud"></i> Backup</li>
+            <li class="{{ 'ativo' if pagina_ativa == 'calendario' }}" onclick="location.href='/calendario'"><i data-lucide="calendar"></i> Calendário</li>
             <li class="{{ 'ativo' if pagina_ativa == 'configuracoes' }}" onclick="location.href='/configuracoes'"><i data-lucide="settings"></i> Configurações</li>
         </ul>
 
-        <div class="logout">
+        <div class="logout" onclick="location.href='/'">
             <i data-lucide="log-out"></i>
             <span>Sair</span>
         </div>
@@ -43,7 +43,12 @@
         <!-- TOPBAR -->
         <div class="topbar">
             <h2>{% block topbar_titulo %}evolua{% endblock %}</h2>
-            <input type="text" placeholder="Pesquisar">
+            <div class="pesquisa-wrapper">
+                <input type="text" id="input-pesquisa" placeholder="Pesquisar"
+                       oninput="pesquisar(this.value)" onblur="fecharPesquisa()">
+                <i data-lucide="search"></i>
+                <div class="pesquisa-dropdown" id="pesquisa-dropdown" style="display:none;"></div>
+            </div>
         </div>
 
         <!-- CONTEÚDO DA TELA -->
@@ -54,7 +59,81 @@
 
 <script>
     lucide.createIcons();
+
+    function pesquisar(termo) {
+        const dropdown = document.getElementById('pesquisa-dropdown');
+        termo = termo.trim().toLowerCase();
+
+        if (!termo) {
+            dropdown.style.display = 'none';
+            return;
+        }
+
+        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+        const disciplinas = JSON.parse(localStorage.getItem('disciplinas')) || [];
+        const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
+        const eventos = JSON.parse(localStorage.getItem('eventos')) || {};
+
+        let resultados = [];
+
+        tarefas.forEach(t => {
+            if (t.nome.toLowerCase().includes(termo)) {
+                resultados.push({ tipo: 'Tarefa', texto: t.nome, icone: 'check-square', link: '/tarefas' });
+            }
+        });
+
+        disciplinas.forEach(d => {
+            if (d.nome.toLowerCase().includes(termo)) {
+                resultados.push({ tipo: 'Disciplina', texto: d.nome, icone: 'book', link: '/disciplinas', cor: d.cor });
+            }
+        });
+
+        sessoes.forEach(s => {
+            if (s.disciplina.toLowerCase().includes(termo)) {
+                const [ano, mes, dia] = s.data.split('-');
+                resultados.push({ tipo: 'Sessão', texto: `${s.disciplina} · ${dia}/${mes}/${ano}`, icone: 'clock', link: '/sessoes' });
+            }
+        });
+
+        Object.entries(eventos).forEach(([data, evs]) => {
+            evs.forEach(e => {
+                if (e.texto.toLowerCase().includes(termo)) {
+                    const [ano, mes, dia] = data.split('-');
+                    resultados.push({ tipo: 'Compromisso', texto: `${e.texto} · ${dia}/${mes}/${ano}`, icone: 'calendar', link: '/calendario' });
+                }
+            });
+        });
+
+        if (resultados.length === 0) {
+            dropdown.innerHTML = '<p class="pesquisa-vazio">Nenhum resultado encontrado.</p>';
+            dropdown.style.display = 'block';
+            return;
+        }
+
+        dropdown.innerHTML = resultados.map(r => `
+            <div class="pesquisa-item" onmousedown="location.href='${r.link}'">
+                <div class="pesquisa-item-icone" ${r.cor ? `style="color:${r.cor}"` : ''}>
+                    <i data-lucide="${r.icone}"></i>
+                </div>
+                <div class="pesquisa-item-info">
+                    <span class="pesquisa-item-tipo">${r.tipo}</span>
+                    <span class="pesquisa-item-texto">${r.texto}</span>
+                </div>
+            </div>
+        `).join('');
+
+        dropdown.style.display = 'block';
+        lucide.createIcons();
+    }
+
+    function fecharPesquisa() {
+        setTimeout(() => {
+            document.getElementById('pesquisa-dropdown').style.display = 'none';
+        }, 200);
+    }
 </script>
-  {% block scripts %}{% endblock %}
+
+{% block scripts %}{% endblock %}
+
 </body>
 </html>

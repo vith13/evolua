@@ -22,6 +22,30 @@ def disciplinas():
 def sessoes():
     return render_template("sessoes.html", pagina_ativa="sessoes")
 
+@app.route("/foco")
+def foco():
+    return render_template("foco.html", pagina_ativa="foco")
+
+@app.route("/relatorio")
+def relatorio():
+    return render_template("relatorio.html", pagina_ativa="relatorio")
+
+@app.route("/calendario")
+def calendario():
+    return render_template("calendario.html", pagina_ativa="calendario")
+
+@app.route("/configuracoes")
+def configuracoes():
+    return render_template("configuracoes.html", pagina_ativa="configuracoes")
+
+@app.route("/cadastro")
+def cadastro():
+    return render_template("cadastro.html")
+
+@app.route("/esqueci-senha")
+def esqueci_senha():
+    return render_template("esqueci-senha.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

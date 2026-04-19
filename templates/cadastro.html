@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Evolua - Login</title>
+    <title>Evolua - Cadastro</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;700&display=swap" rel="stylesheet">
@@ -10,33 +10,27 @@
 <body>
     <div class="logo">e</div>
 
-    <div class="logo-direita">evolua</div>
-
-
-
-   <!--INCLUIR NO FUTURO-->
-   <!-- <nav class="menu">
+    
+    <!--<nav class="menu">
         <a href="#">Principal</a>
         <a href="#">Serviços</a>
         <a href="#">Sobre</a>
-        <a href="#">Entrar</a>
+        <a href="/">Entrar</a>
     </nav> -->
 
     <div class="login-container">
-        <h2>Bem-vindo de volta!</h2>
+        <h2>Criar conta</h2>
 
         <form action="/dashboard" method="GET">
+            <input type="text" placeholder="Nome completo">
             <input type="email" placeholder="Email">
             <input type="password" placeholder="Senha">
-           <p class="forgot-text">
-            <a href="/esqueci-senha">Esqueci minha senha</a>
-           </p>
-           
-            <button type="submit">Entrar</button>
+            <input type="password" placeholder="Confirmar senha">
+            <button type="submit">Cadastrar</button>
         </form>
 
         <p class="register-text">
-            Não possui conta? <a href="/cadastro"><span>Registrar</span></a>
+            Já possui conta? <a href="/"><span>Entrar</span></a>
         </p>
     </div>
 

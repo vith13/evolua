@@ -62,9 +62,8 @@ body {
 }
 
 .menu-lateral li:hover {
-    background: #B6D5E4; 
+    background: #B6D5E4;
     font-weight: 700;
-    padding: 6px 15px;
 }
 
 .menu-lateral li.ativo {
@@ -100,8 +99,11 @@ body {
 
 
 .main {
-    flex: 0px;
-    padding: 1px;
+    flex: 1;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /*--------BARRA DE CIMA----------------*/
@@ -137,4 +139,111 @@ body {
 
     font-family: 'League Spartan', sans-serif;
    
+}
+
+
+
+/* PESQUISA */
+.pesquisa-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pesquisa-wrapper input {
+    border: none;
+    outline: none;
+    background: #f0f0f0;
+    padding: 8px 36px 8px 16px;
+    border-radius: 8px;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 14px;
+    width: 200px;
+    transition: 0.2s;
+}
+
+.pesquisa-wrapper input:focus {
+    width: 260px;
+    background: #e8f0f5;
+}
+
+.pesquisa-wrapper i {
+    position: absolute;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    color: #093952;
+    opacity: 0.5;
+}
+
+.pesquisa-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    width: 300px;
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 200;
+    padding: 8px 0;
+}
+
+.pesquisa-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.pesquisa-item:hover {
+    background: #f7f9fb;
+}
+
+.pesquisa-item-icone {
+    width: 32px;
+    height: 32px;
+    background: #f0f4f7;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #093952;
+    flex-shrink: 0;
+}
+
+.pesquisa-item-icone i {
+    width: 16px;
+    height: 16px;
+}
+
+.pesquisa-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pesquisa-item-tipo {
+    font-size: 11px;
+    color: #aaa;
+    font-family: 'League Spartan', sans-serif;
+}
+
+.pesquisa-item-texto {
+    font-size: 14px;
+    color: #093952;
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 600;
+}
+
+.pesquisa-vazio {
+    padding: 16px;
+    color: #bbb;
+    font-style: italic;
+    font-size: 13px;
+    font-family: 'League Spartan', sans-serif;
+    text-align: center;
 }

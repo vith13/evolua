@@ -165,3 +165,61 @@
 
 .btn-confirmar { background: #093952; color: white; }
 .btn-confirmar:hover { background: #B6D5E4; color: #093952; }
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #093952;
+    font-family: 'League Spartan', sans-serif;
+}
+
+.campo input {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'League Spartan', sans-serif;
+    font-size: 14px;
+    outline: none;
+    color: #093952;
+}
+
+.campo input:focus { border-color: #093952; }
+
+/* SELETOR DE CORES */
+.cores-opcoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cor-opcao {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 3px solid transparent;
+}
+
+.cor-opcao:hover {
+    transform: scale(1.15);
+}
+
+.cor-opcao.selecionada {
+    border: 3px solid #093952;
+    transform: scale(1.15);
+}
+
+
+.disciplina-cor-tag {
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}

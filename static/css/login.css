@@ -128,24 +128,61 @@ button:hover {
     color: #1f4e5f; 
 }
 
-.menu {
+.logo-direita {
     position: absolute;
     top: 30px;
-    right: 30px;
+    right: 40px;
 
-    display: flex;
-    gap: 25px; /* espaço entre os itens */
-    font-weight: 700;
-    
+    font-family: 'Quicksand', sans-serif;
+    font-size: 32px;
+    font-weight: 500;
+    color: #1f4e5f;
 }
 
-.menu a {
+
+.forgot-text {
+    font-size: 13px;
+    margin: 4px 0 0;
+    font-weight: 300;
+    width: 100%;
+    text-align: left;
+    font-style: italic;
+}
+
+.forgot-text a {
+    color: #1f4e5f;
     text-decoration: none;
+    font-weight: 300;
+}
 
-    font-family: 'League Spartan', sans-serif;
-    font-weight: 700; /* light */
+.forgot-text a:hover {
+    text-decoration: underline;
+}
 
-    color: #1f4e5f; /* azul do seu projeto */
+.register-text a {
+    text-decoration: none;
+}
 
-    font-size: 22px;
+.register-text span {
+    font-weight: 700;
+    cursor: pointer;
+    color: #1f4e5f;
+}
+
+.esqueci-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: #1f4e5f;
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.confirmacao-texto {
+    font-size: 14px;
+    font-weight: 300;
+    color: #1f4e5f;
+    text-align: center;
+    line-height: 1.6;
+    margin: 10px 0;
 }

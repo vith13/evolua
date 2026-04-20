@@ -19,6 +19,9 @@ O **Evolua** é uma aplicação web minimalista para gestão de estudos, desenvo
 - 🔍 Barra de pesquisa global (tarefas, disciplinas, sessões e compromissos)
 - ☁️ Backup manual — exportar e importar dados em JSON
 - ⚙️ Configurações de perfil, dados e conta
+- 🔐 Autenticação com cadastro, login e recuperação de senha por email
+- 🛡️ Proteção de rotas — acesso restrito a usuários autenticados
+- 🔒 Senhas criptografadas com hash seguro
 
 ---
 
@@ -30,7 +33,23 @@ O **Evolua** é uma aplicação web minimalista para gestão de estudos, desenvo
 - **Jinja2** — templates HTML com herança (`base.html`)
 - **Lucide Icons** — ícones
 - **Chart.js** — gráficos de relatório e dashboard
-- **LocalStorage** — persistência temporária dos dados (front-end)
+- **Flask-Mail** — envio de emails para recuperação de senha
+- **Werkzeug** — criptografia de senhas
+- **itsdangerous** — geração de tokens seguros para redefinição de senha
+- **python-dotenv** — gerenciamento seguro de variáveis de ambiente
+- **JSON** — persistência de dados no servidor
+
+---
+
+## 🧠 Conceitos de POO aplicados
+
+| Conceito | Onde foi aplicado |
+|---|---|
+| **Classe** | `Entidade`, `Disciplina`, `Tarefa`, `Sessao`, `Usuario`, `Relatorio` |
+| **Herança** | `Disciplina`, `Tarefa`, `Sessao`, `SessaoFoco`, `Evento` herdam de `ItemEstudo` |
+| **Abstrato** | `ItemEstudo` é abstrata com métodos `to_dict()` e `resumo()` obrigatórios |
+| **Polimorfismo** | `resumo()` se comporta diferente em `Sessao`, `SessaoFoco`, `Tarefa` e `Evento` |
+| **Overloading** | `Relatorio.gerar()` aceita parâmetros opcionais `periodo` e `disciplina` |
 
 ---
 
@@ -43,7 +62,10 @@ projeto_software/
 │   └── dados.json
 │
 ├── models/
+│   └── models.py
+│
 ├── services/
+│   └── sistema.py
 │
 ├── static/
 │   ├── css/
@@ -64,6 +86,7 @@ projeto_software/
 │   ├── login.html
 │   ├── cadastro.html
 │   ├── esqueci-senha.html
+│   ├── redefinir-senha.html
 │   ├── dashboard.html
 │   ├── tarefas.html
 │   ├── disciplinas.html
@@ -75,6 +98,8 @@ projeto_software/
 │
 ├── app.py
 ├── backend.py
+├── .env              
+├── .gitignore
 └── README.md
 ```
 
@@ -86,12 +111,13 @@ projeto_software/
 
 - [Python 3.10+](https://www.python.org/downloads/) instalado
 - pip (gerenciador de pacotes do Python, já vem com o Python)
+- Uma conta Gmail com senha de app configurada (para recuperação de senha)
 
 ### Passo a passo
 
 **1. Clone o repositório**
 ```bash
-git clone https://github.com/seu-usuario/evolua.git
+git clone https://github.com/vith13/evolua.git
 cd evolua
 ```
 
@@ -108,15 +134,23 @@ source venv/bin/activate
 
 **3. Instale as dependências**
 ```bash
-pip install flask
+pip install flask flask-mail werkzeug itsdangerous python-dotenv
 ```
 
-**4. Execute a aplicação**
+**4. Configure as variáveis de ambiente**
+
+Crie um arquivo `.env` na raiz do projeto:
+```
+MAIL_USERNAME=seuemail@gmail.com
+MAIL_PASSWORD=suasenhadapp
+```
+
+**5. Execute a aplicação**
 ```bash
 python app.py
 ```
 
-**5. Acesse no navegador**
+**6. Acesse no navegador**
 ```
 http://127.0.0.1:5000
 ```
@@ -129,7 +163,8 @@ http://127.0.0.1:5000
 |---|---|
 | `/` | Tela de login |
 | `/cadastro` | Cadastro de novo usuário |
-| `/esqueci-senha` | Redefinição de senha |
+| `/esqueci-senha` | Solicitação de redefinição de senha |
+| `/redefinir-senha/<token>` | Redefinição de senha via token |
 | `/dashboard` | Painel principal |
 | `/tarefas` | Gerenciamento de tarefas |
 | `/disciplinas` | Cadastro de disciplinas |
@@ -141,6 +176,28 @@ http://127.0.0.1:5000
 
 ---
 
+## 🔌 API disponível
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/api/cadastrar` | Cadastrar usuário |
+| POST | `/api/login` | Fazer login |
+| GET | `/api/logout` | Encerrar sessão |
+| GET/POST | `/api/disciplinas` | Listar ou criar disciplina |
+| PUT | `/api/disciplinas` | Editar disciplina |
+| DELETE | `/api/disciplinas/<nome>` | Remover disciplina |
+| GET/POST | `/api/tarefas` | Listar ou criar tarefa |
+| PUT | `/api/tarefas/<index>/concluir` | Concluir tarefa |
+| DELETE | `/api/tarefas/<index>` | Remover tarefa |
+| GET/POST | `/api/sessoes` | Listar ou registrar sessão |
+| DELETE | `/api/sessoes/<index>` | Remover sessão |
+| GET/POST | `/api/eventos` | Listar ou adicionar evento |
+| DELETE | `/api/eventos/<data>/<index>` | Remover evento |
+| GET | `/api/relatorio` | Gerar relatório |
+| GET/POST | `/api/backup` | Exportar ou importar backup |
+
+---
+
 ## 🔮 Melhorias futuras
 
 - 🌙 Tema escuro
@@ -148,6 +205,7 @@ http://127.0.0.1:5000
 - 🔔 Notificações de lembrete de estudo
 - 📅 Integração com Google Calendar
 - 🌐 Lançamento como SaaS com planos e autenticação real
+- 🗄️ Migração para banco de dados relacional (PostgreSQL)
 
 ---
 

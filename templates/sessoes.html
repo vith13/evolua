@@ -67,11 +67,17 @@
 
 {% block scripts %}
 <script>
-    let sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
-    let disciplinas = JSON.parse(localStorage.getItem('disciplinas')) || [];
+    let sessoes = [];
+    let disciplinas = [];
 
-    function salvar() {
-        localStorage.setItem('sessoes', JSON.stringify(sessoes));
+    async function carregar() {
+        const [rSessoes, rDisciplinas] = await Promise.all([
+            fetch('/api/sessoes'),
+            fetch('/api/disciplinas')
+        ]);
+        sessoes = await rSessoes.json();
+        disciplinas = await rDisciplinas.json();
+        renderizar();
     }
 
     function formatarDuracao(horas, minutos) {
@@ -142,7 +148,7 @@
         document.getElementById('modal').style.display = 'none';
     }
 
-    function salvarSessao() {
+    async function salvarSessao() {
         const disciplina = document.getElementById('input-disciplina').value;
         const data = document.getElementById('input-data').value;
         const horas = parseInt(document.getElementById('input-horas').value) || 0;
@@ -150,18 +156,21 @@
 
         if (!disciplina || !data || (horas === 0 && minutos === 0)) return;
 
-        sessoes.push({ disciplina, data, horas, minutos });
-        salvar();
+        await fetch('/api/sessoes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ disciplina, data, horas, minutos })
+        });
+
         fecharModal();
-        renderizar();
+        carregar();
     }
 
-    function excluirSessao(index) {
-        sessoes.splice(index, 1);
-        salvar();
-        renderizar();
+    async function excluirSessao(index) {
+        await fetch(`/api/sessoes/${index}`, { method: 'DELETE' });
+        carregar();
     }
 
-    renderizar();
-    </script>
+    carregar();
+</script>
 {% endblock %}

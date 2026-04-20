@@ -38,14 +38,21 @@
     </div>
 
     <script>
-        function enviarEmail(e) {
-            e.preventDefault();
-            const email = document.getElementById('input-email').value.trim();
-            if (!email) return;
-            document.getElementById('tela-email').style.display = 'none';
-            document.getElementById('tela-confirmacao').style.display = 'block';
-        }
-    </script>
+    async function enviarEmail(e) {
+        e.preventDefault();
+        const email = document.getElementById('input-email').value.trim();
+        if (!email) return;
+
+        document.getElementById('tela-email').style.display = 'none';
+        document.getElementById('tela-confirmacao').style.display = 'block';
+
+        fetch('/api/esqueci-senha', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+    }
+</script>
 
 </body>
 </html>

@@ -182,41 +182,52 @@
         atualizarRing();
     }
 
-    function aoTerminar() {
-        popularDisciplinas();
-        document.getElementById('modal-salvar').style.display = 'flex';
+    async function aoTerminar() {
+    await popularDisciplinas();
+    document.getElementById('modal-salvar').style.display = 'flex';
     }
 
-    function popularDisciplinas() {
-        const select = document.getElementById('input-disciplina');
-        select.innerHTML = '<option value="">Não salvar em nenhuma disciplina</option>';
-        disciplinas.forEach(d => {
-            const option = document.createElement('option');
-            option.value = d.nome;
-            option.textContent = d.nome;
-            select.appendChild(option);
+    async function popularDisciplinas() {
+    const resp = await fetch('/api/disciplinas');
+    const disciplinas = await resp.json();
+    const select = document.getElementById('input-disciplina');
+    select.innerHTML = '<option value="">Não salvar em nenhuma disciplina</option>';
+    disciplinas.forEach(d => {
+        const option = document.createElement('option');
+        option.value = d.nome;
+        option.textContent = d.nome;
+        select.appendChild(option);
+      });
+    } 
+
+    async function salvarSessao() {
+    const disciplina = document.getElementById('input-disciplina').value;
+
+    if (disciplina) {
+        const horas = Math.floor(tempoTotal / 3600);
+        const minutos = Math.floor((tempoTotal % 3600) / 60);
+
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = hoje.getFullYear();
+        const dataHoje = `${ano}-${mes}-${dia}`;
+
+        await fetch('/api/sessoes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                disciplina,
+                data: dataHoje,
+                horas,
+                minutos,
+                foco: true
+            })
         });
     }
 
-    function salvarSessao() {
-        const disciplina = document.getElementById('input-disciplina').value;
-
-        if (disciplina) {
-            const totalSegundos = tempoTotal;
-            const horas = Math.floor(totalSegundos / 3600);
-            const minutos = Math.floor((totalSegundos % 3600) / 60);
-            const hoje = new Date();
-            const dia = String(hoje.getDate()).padStart(2, '0');
-            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-            const ano = hoje.getFullYear();
-            const dataHoje = `${ano}-${mes}-${dia}`;
-
-            sessoes.push({ disciplina, data: dataHoje, horas, minutos });
-            localStorage.setItem('sessoes', JSON.stringify(sessoes));
-        }
-
-        fecharModal();
-        resetarTimer();
+    fecharModal();
+    resetarTimer();
     }
 
     function descartarSessao() {

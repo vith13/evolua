@@ -1,78 +1,137 @@
-from models.disciplina import Disciplina
-from models.sessao import SessaoEstudo
-from models.tarefa import Tarefa
-import time
+import json
+from models.models import Disciplina, Tarefa, Sessao, SessaoFoco, Evento, Relatorio
+
 
 class SistemaEstudos:
+    """Gerencia todas as operações do sistema Evolua."""
+
     def __init__(self):
-        self.disciplinas = []
-        self.sessoes = []
-        self.tarefas = []
+        self.arquivo = "data/dados.json"
+        self.dados = self._carregar()
 
-    def iniciar_modo_foco(self):
-      if not self.disciplinas:
-        print("Nenhuma disciplina cadastrada!")
-        return
+    def _carregar(self) -> dict:
+        try:
+            with open(self.arquivo, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
+            return {
+                "usuarios": [],
+                "disciplinas": [],
+                "sessoes": [],
+                "tarefas": [],
+                "eventos": {}
+            }
 
-      print("\nDisciplinas:")
-      for d in self.disciplinas:
-        print(d)
+    def _salvar(self):
+        with open(self.arquivo, "w", encoding="utf-8") as f:
+            json.dump(self.dados, f, indent=4, ensure_ascii=False)
 
-      disciplina_id = int(input("Escolha o ID da disciplina: "))
-      minutos = int(input("Duração do foco (minutos): "))
+    # -------------------- DISCIPLINAS --------------------
+    def cadastrar_disciplina(self, nome: str, cor: str = "#093952") -> dict:
+        for d in self.dados["disciplinas"]:
+            if d["nome"] == nome:
+                return {"erro": "Disciplina já existe!"}
+        disciplina = Disciplina(nome, cor)
+        self.dados["disciplinas"].append(disciplina.to_dict())
+        self._salvar()
+        return {"sucesso": "Disciplina cadastrada!", "disciplina": disciplina.to_dict()}
 
-      print("\nModo foco iniciado...")
+    def listar_disciplinas(self) -> list:
+        return self.dados["disciplinas"]
 
-      for i in range(minutos, 0, -1):
-        print(f"Tempo restante: {i} min")
-        time.sleep(1)
+    def editar_disciplina(self, nome_atual: str, novo_nome: str, nova_cor: str) -> dict:
+        for d in self.dados["disciplinas"]:
+            if d["nome"] == nome_atual:
+                d["nome"] = novo_nome
+                d["cor"] = nova_cor
+                self._salvar()
+                return {"sucesso": "Disciplina atualizada!"}
+        return {"erro": "Disciplina não encontrada!"}
 
-      print("\nSessão de foco concluída! 🎯")
+    def remover_disciplina(self, nome: str) -> dict:
+        self.dados["disciplinas"] = [d for d in self.dados["disciplinas"] if d["nome"] != nome]
+        self._salvar()
+        return {"sucesso": "Disciplina removida!"}
 
-      from datetime import date
-      hoje = str(date.today())
-      horas = minutos / 60
+    # -------------------- TAREFAS --------------------
+    def adicionar_tarefa(self, nome: str) -> dict:
+        tarefa = Tarefa(nome)
+        self.dados["tarefas"].append(tarefa.to_dict())
+        self._salvar()
+        return {"sucesso": "Tarefa adicionada!", "tarefa": tarefa.to_dict()}
 
-      self.adicionar_sessao(disciplina_id, hoje, horas)
+    def listar_tarefas(self) -> list:
+        return self.dados["tarefas"]
 
-    # DISCIPLINAS
-    def adicionar_disciplina(self, nome):
-        novo_id = len(self.disciplinas) + 1
-        disciplina = Disciplina(novo_id, nome)
-        self.disciplinas.append(disciplina)
-        print("Disciplina adicionada!")
+    def concluir_tarefa(self, index: int) -> dict:
+        try:
+            self.dados["tarefas"][index]["concluida"] = True
+            self._salvar()
+            return {"sucesso": "Tarefa concluída!"}
+        except IndexError:
+            return {"erro": "Tarefa não encontrada!"}
 
-    def listar_disciplinas(self):
-        for d in self.disciplinas:
-            print(d)
+    def remover_tarefa(self, index: int) -> dict:
+        try:
+            self.dados["tarefas"].pop(index)
+            self._salvar()
+            return {"sucesso": "Tarefa removida!"}
+        except IndexError:
+            return {"erro": "Tarefa não encontrada!"}
 
-    # SESSÕES
-    def adicionar_sessao(self, disciplina_id, data, duracao):
-        novo_id = len(self.sessoes) + 1
-        sessao = SessaoEstudo(novo_id, disciplina_id, data, duracao)
-        self.sessoes.append(sessao)
-        print("Sessão registrada!")
+    # -------------------- SESSÕES --------------------
+    def registrar_sessao(self, disciplina: str, horas: int, minutos: int, data: str = None, foco: bool = False) -> dict:
+        if foco:
+            sessao = SessaoFoco("Sessão Foco", disciplina, horas, minutos, data)
+        else:
+            sessao = Sessao("Sessão", disciplina, horas, minutos, data)
+        self.dados["sessoes"].append(sessao.to_dict())
+        self._salvar()
+        return {"sucesso": "Sessão registrada!", "sessao": sessao.to_dict()}
 
-    def listar_sessoes(self):
-        for s in self.sessoes:
-            print(s)
+    def listar_sessoes(self) -> list:
+        return self.dados["sessoes"]
 
-    # TAREFAS
-    def adicionar_tarefa(self, descricao):
-        novo_id = len(self.tarefas) + 1
-        tarefa = Tarefa(novo_id, descricao)
-        self.tarefas.append(tarefa)
-        print("Tarefa adicionada!")
+    def remover_sessao(self, index: int) -> dict:
+        try:
+            self.dados["sessoes"].pop(index)
+            self._salvar()
+            return {"sucesso": "Sessão removida!"}
+        except IndexError:
+            return {"erro": "Sessão não encontrada!"}
 
-    def listar_tarefas(self):
-        for t in self.tarefas:
-            print(t)
+    # -------------------- EVENTOS --------------------
+    def adicionar_evento(self, data: str, texto: str, disciplina: str = "") -> dict:
+        evento = Evento(texto, data, disciplina)
+        if data not in self.dados["eventos"]:
+            self.dados["eventos"][data] = []
+        self.dados["eventos"][data].append(evento.to_dict())
+        self._salvar()
+        return {"sucesso": "Evento adicionado!", "evento": evento.to_dict()}
 
-    def concluir_tarefa(self, id_tarefa):
-        for t in self.tarefas:
-            if t.id == id_tarefa:
-                t.concluida = True
-                print("Tarefa concluída!")
+    def listar_eventos(self) -> dict:
+        return self.dados["eventos"]
 
+    def remover_evento(self, data: str, index: int) -> dict:
+        try:
+            self.dados["eventos"][data].pop(index)
+            if not self.dados["eventos"][data]:
+                del self.dados["eventos"][data]
+            self._salvar()
+            return {"sucesso": "Evento removido!"}
+        except:
+            return {"erro": "Evento não encontrado!"}
 
-                
+    # -------------------- RELATÓRIO --------------------
+    def gerar_relatorio(self, periodo: str = "semana", disciplina: str = None) -> dict:
+        relatorio = Relatorio(self.dados["sessoes"])
+        return relatorio.gerar(periodo, disciplina)
+
+    # -------------------- BACKUP --------------------
+    def exportar_backup(self) -> dict:
+        return self.dados
+
+    def importar_backup(self, dados: dict) -> dict:
+        self.dados = dados
+        self._salvar()
+        return {"sucesso": "Backup importado!"}

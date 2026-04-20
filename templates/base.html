@@ -15,9 +15,27 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="perfil">
-            <div class="avatar"></div>
-            <h3>Emilly</h3>
-            <p>emily@gmail.com</p>
+             <div class="avatar" id="avatar-sidebar">
+    <span class="avatar-inicial" id="avatar-inicial">{{ nome[0].upper() if nome else 'U' }}</span>
+    <img id="avatar-img" src="" style="display:none; width:100%; height:100%; border-radius:50%; object-fit:cover;">
+    <div class="avatar-overlay" onclick="toggleMenuFoto()">
+        <i data-lucide="camera"></i>
+    </div>
+</div>
+
+<!-- MENU DE FOTO -->
+<div class="avatar-menu" id="avatar-menu" style="display:none;">
+    <div class="avatar-menu-item" onclick="document.getElementById('input-foto').click()">
+        <i data-lucide="upload"></i> Trocar foto
+    </div>
+    <div class="avatar-menu-item avatar-menu-perigo" onclick="removerFoto()">
+        <i data-lucide="trash-2"></i> Remover foto
+    </div>
+</div>
+
+<input type="file" id="input-foto" accept="image/*" style="display:none" onchange="alterarFoto(event)">
+            <h3>{{ nome }}</h3>
+            <p>{{ session.get('email', '') }}</p>
         </div>
 
         <ul class="menu-lateral">
@@ -36,6 +54,7 @@
             <span>Sair</span>
         </div>
     </div>
+    <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="alterarFoto(event)">
 
     <!-- CONTEÚDO PRINCIPAL -->
     <div class="main {% block classe_main %}{% endblock %}">
@@ -60,70 +79,77 @@
 <script>
     lucide.createIcons();
 
-    function pesquisar(termo) {
-        const dropdown = document.getElementById('pesquisa-dropdown');
-        termo = termo.trim().toLowerCase();
+    async function pesquisar(termo) {
+    const dropdown = document.getElementById('pesquisa-dropdown');
+    termo = termo.trim().toLowerCase();
 
-        if (!termo) {
-            dropdown.style.display = 'none';
-            return;
+    if (!termo) {
+        dropdown.style.display = 'none';
+        return;
+    }
+
+    const [rTarefas, rDisciplinas, rSessoes, rEventos] = await Promise.all([
+        fetch('/api/tarefas'),
+        fetch('/api/disciplinas'),
+        fetch('/api/sessoes'),
+        fetch('/api/eventos')
+    ]);
+
+    const tarefas = await rTarefas.json();
+    const disciplinas = await rDisciplinas.json();
+    const sessoes = await rSessoes.json();
+    const eventos = await rEventos.json();
+
+    let resultados = [];
+
+    tarefas.forEach(t => {
+        if (t.nome.toLowerCase().includes(termo)) {
+            resultados.push({ tipo: 'Tarefa', texto: t.nome, icone: 'check-square', link: '/tarefas' });
         }
+    });
 
-        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-        const disciplinas = JSON.parse(localStorage.getItem('disciplinas')) || [];
-        const sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
-        const eventos = JSON.parse(localStorage.getItem('eventos')) || {};
-
-        let resultados = [];
-
-        tarefas.forEach(t => {
-            if (t.nome.toLowerCase().includes(termo)) {
-                resultados.push({ tipo: 'Tarefa', texto: t.nome, icone: 'check-square', link: '/tarefas' });
-            }
-        });
-
-        disciplinas.forEach(d => {
-            if (d.nome.toLowerCase().includes(termo)) {
-                resultados.push({ tipo: 'Disciplina', texto: d.nome, icone: 'book', link: '/disciplinas', cor: d.cor });
-            }
-        });
-
-        sessoes.forEach(s => {
-            if (s.disciplina.toLowerCase().includes(termo)) {
-                const [ano, mes, dia] = s.data.split('-');
-                resultados.push({ tipo: 'Sessão', texto: `${s.disciplina} · ${dia}/${mes}/${ano}`, icone: 'clock', link: '/sessoes' });
-            }
-        });
-
-        Object.entries(eventos).forEach(([data, evs]) => {
-            evs.forEach(e => {
-                if (e.texto.toLowerCase().includes(termo)) {
-                    const [ano, mes, dia] = data.split('-');
-                    resultados.push({ tipo: 'Compromisso', texto: `${e.texto} · ${dia}/${mes}/${ano}`, icone: 'calendar', link: '/calendario' });
-                }
-            });
-        });
-
-        if (resultados.length === 0) {
-            dropdown.innerHTML = '<p class="pesquisa-vazio">Nenhum resultado encontrado.</p>';
-            dropdown.style.display = 'block';
-            return;
+    disciplinas.forEach(d => {
+        if (d.nome.toLowerCase().includes(termo)) {
+            resultados.push({ tipo: 'Disciplina', texto: d.nome, icone: 'book', link: '/disciplinas', cor: d.cor });
         }
+    });
 
-        dropdown.innerHTML = resultados.map(r => `
-            <div class="pesquisa-item" onmousedown="location.href='${r.link}'">
-                <div class="pesquisa-item-icone" ${r.cor ? `style="color:${r.cor}"` : ''}>
-                    <i data-lucide="${r.icone}"></i>
-                </div>
-                <div class="pesquisa-item-info">
-                    <span class="pesquisa-item-tipo">${r.tipo}</span>
-                    <span class="pesquisa-item-texto">${r.texto}</span>
-                </div>
-            </div>
-        `).join('');
+    sessoes.forEach(s => {
+        if (s.disciplina.toLowerCase().includes(termo)) {
+            const [ano, mes, dia] = s.data.split('-');
+            resultados.push({ tipo: 'Sessão', texto: `${s.disciplina} · ${dia}/${mes}/${ano}`, icone: 'clock', link: '/sessoes' });
+        }
+    });
 
+    Object.entries(eventos).forEach(([data, evs]) => {
+        evs.forEach(e => {
+            if (e.texto.toLowerCase().includes(termo)) {
+                const [ano, mes, dia] = data.split('-');
+                resultados.push({ tipo: 'Compromisso', texto: `${e.texto} · ${dia}/${mes}/${ano}`, icone: 'calendar', link: '/calendario' });
+            }
+        });
+    });
+
+    if (resultados.length === 0) {
+        dropdown.innerHTML = '<p class="pesquisa-vazio">Nenhum resultado encontrado.</p>';
         dropdown.style.display = 'block';
-        lucide.createIcons();
+        return;
+    }
+
+    dropdown.innerHTML = resultados.map(r => `
+        <div class="pesquisa-item" onmousedown="location.href='${r.link}'">
+            <div class="pesquisa-item-icone" ${r.cor ? `style="color:${r.cor}"` : ''}>
+                <i data-lucide="${r.icone}"></i>
+            </div>
+            <div class="pesquisa-item-info">
+                <span class="pesquisa-item-tipo">${r.tipo}</span>
+                <span class="pesquisa-item-texto">${r.texto}</span>
+            </div>
+        </div>
+    `).join('');
+
+    dropdown.style.display = 'block';
+    lucide.createIcons();
     }
 
     function fecharPesquisa() {
@@ -131,6 +157,53 @@
             document.getElementById('pesquisa-dropdown').style.display = 'none';
         }, 200);
     }
+
+    // FOTO DE PERFIL
+// FOTO DE PERFIL
+const fotoSalva = localStorage.getItem('foto_perfil');
+if (fotoSalva) {
+    document.getElementById('avatar-img').src = fotoSalva;
+    document.getElementById('avatar-img').style.display = 'block';
+    document.getElementById('avatar-inicial').style.display = 'none';
+}
+
+function toggleMenuFoto() {
+    const menu = document.getElementById('avatar-menu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function alterarFoto(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const src = e.target.result;
+        localStorage.setItem('foto_perfil', src);
+        document.getElementById('avatar-img').src = src;
+        document.getElementById('avatar-img').style.display = 'block';
+        document.getElementById('avatar-inicial').style.display = 'none';
+        document.getElementById('avatar-menu').style.display = 'none';
+    };
+    reader.readAsDataURL(arquivo);
+}
+
+function removerFoto() {
+    localStorage.removeItem('foto_perfil');
+    document.getElementById('avatar-img').style.display = 'none';
+    document.getElementById('avatar-img').src = '';
+    document.getElementById('avatar-inicial').style.display = 'block';
+    document.getElementById('avatar-menu').style.display = 'none';
+}
+
+// Fechar menu ao clicar fora
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('avatar-menu');
+    if (!e.target.closest('.avatar') && !e.target.closest('.avatar-menu')) {
+        menu.style.display = 'none';
+    }
+});
+
 </script>
 
 {% block scripts %}{% endblock %}

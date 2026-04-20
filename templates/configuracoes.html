@@ -108,82 +108,92 @@
     </div>
 
     <script>
-        const perfil = JSON.parse(localStorage.getItem('perfil')) || {};
-        document.getElementById('input-nome').value = perfil.nome || '';
-        document.getElementById('input-email').value = perfil.email || '';
+    // CARREGAR PERFIL DA SESSÃO
+    document.getElementById('input-nome').value = "{{ session.get('usuario', '') }}";
+    document.getElementById('input-email').value = "{{ session.get('email', '') }}";
 
-        function salvarPerfil() {
-            const nome = document.getElementById('input-nome').value.trim();
-            const email = document.getElementById('input-email').value.trim();
-            if (!nome && !email) return;
-            localStorage.setItem('perfil', JSON.stringify({ nome, email }));
-            mostrarToast('✓ Perfil salvo!');
-        }
+    async function exportarBackup() {
+        const resp = await fetch('/api/backup');
+        const dados = await resp.json();
 
-        function exportarBackup() {
-            const dados = {
-                disciplinas: JSON.parse(localStorage.getItem('disciplinas')) || [],
-                sessoes: JSON.parse(localStorage.getItem('sessoes')) || [],
-                tarefas: JSON.parse(localStorage.getItem('tarefas')) || [],
-                eventos: JSON.parse(localStorage.getItem('eventos')) || {},
-                perfil: JSON.parse(localStorage.getItem('perfil')) || {}
-            };
-            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `evolua_backup_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarToast('✓ Backup exportado!');
-        }
+        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
 
-        function importarBackup(event) {
-            const arquivo = event.target.files[0];
-            if (!arquivo) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const dados = JSON.parse(e.target.result);
-                    if (dados.disciplinas) localStorage.setItem('disciplinas', JSON.stringify(dados.disciplinas));
-                    if (dados.sessoes) localStorage.setItem('sessoes', JSON.stringify(dados.sessoes));
-                    if (dados.tarefas) localStorage.setItem('tarefas', JSON.stringify(dados.tarefas));
-                    if (dados.eventos) localStorage.setItem('eventos', JSON.stringify(dados.eventos));
-                    if (dados.perfil) localStorage.setItem('perfil', JSON.stringify(dados.perfil));
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = hoje.getFullYear();
+        a.download = `evolua_backup_${ano}-${mes}-${dia}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        mostrarToast('✓ Backup exportado!');
+    }
+
+    function importarBackup(event) {
+        const arquivo = event.target.files[0];
+        if (!arquivo) return;
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                const resp = await fetch('/api/backup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                const resultado = await resp.json();
+                if (resultado.sucesso) {
                     mostrarToast('✓ Backup importado com sucesso!');
-                } catch {
-                    mostrarToast('✗ Arquivo inválido!');
+                } else {
+                    mostrarToast('✗ Erro ao importar backup!');
                 }
-            };
-            reader.readAsText(arquivo);
-        }
+            } catch {
+                mostrarToast('✗ Arquivo inválido!');
+            }
+        };
+        reader.readAsText(arquivo);
+    }
 
-        function encerrarSessao() {
-            location.href = '/';
-        }
+    function encerrarSessao() {
+        location.href = '/api/logout';
+    }
 
-        function abrirModalLimpar() {
-            document.getElementById('modal-limpar').style.display = 'flex';
-        }
+    function abrirModalLimpar() {
+        document.getElementById('modal-limpar').style.display = 'flex';
+    }
 
-        function fecharModalLimpar() {
-            document.getElementById('modal-limpar').style.display = 'none';
-        }
+    function fecharModalLimpar() {
+        document.getElementById('modal-limpar').style.display = 'none';
+    }
 
-        function limparDados() {
-            localStorage.clear();
-            fecharModalLimpar();
-            mostrarToast('✓ Todos os dados foram apagados!');
-        }
+    async function limparDados() {
+        const dadosVazios = {
+            usuarios: [],
+            disciplinas: [],
+            sessoes: [],
+            tarefas: [],
+            eventos: {}
+        };
+        await fetch('/api/backup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosVazios)
+        });
+        fecharModalLimpar();
+        mostrarToast('✓ Todos os dados foram apagados!');
+    }
 
-        function mostrarToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 3000);
-        }
+    function mostrarToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
 
-        lucide.createIcons();
-    </script>
+    lucide.createIcons();
+</script>
 
 {% endblock %}

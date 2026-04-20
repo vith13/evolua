@@ -56,11 +56,13 @@
 
 {% block scripts %}
 <script>
-    let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+    let tarefas = [];
     let filtroAfazer = 'pendentes';
 
-    function salvar() {
-        localStorage.setItem('tarefas', JSON.stringify(tarefas));
+    async function carregar() {
+        const resp = await fetch('/api/tarefas');
+        tarefas = await resp.json();
+        renderizar();
     }
 
     function renderizar() {
@@ -107,16 +109,16 @@
         return li;
     }
 
-    function toggleTarefa(index) {
-        tarefas[index].concluida = !tarefas[index].concluida;
-        salvar();
-        renderizar();
+    async function toggleTarefa(index) {
+        if (!tarefas[index].concluida) {
+            await fetch(`/api/tarefas/${index}/concluir`, { method: 'PUT' });
+        }
+        carregar();
     }
 
-    function excluirTarefa(index) {
-        tarefas.splice(index, 1);
-        salvar();
-        renderizar();
+    async function excluirTarefa(index) {
+        await fetch(`/api/tarefas/${index}`, { method: 'DELETE' });
+        carregar();
     }
 
     function abrirModal() {
@@ -129,14 +131,19 @@
         document.getElementById('input-tarefa').value = '';
     }
 
-    function adicionarTarefa() {
+    async function adicionarTarefa() {
         const input = document.getElementById('input-tarefa');
         const nome = input.value.trim();
         if (!nome) return;
-        tarefas.push({ nome, concluida: false });
-        salvar();
+
+        await fetch('/api/tarefas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome })
+        });
+
         fecharModal();
-        renderizar();
+        carregar();
     }
 
     function toggleDropdown(event) {
@@ -168,7 +175,6 @@
         if (e.key === 'Enter') adicionarTarefa();
     });
 
-    renderizar();
-    
+    carregar();
 </script>
-{% endblock %} 
+{% endblock %}

@@ -58,150 +58,160 @@
     </div>
 
     <script>
-        let sessoes = JSON.parse(localStorage.getItem('sessoes')) || [];
-        let filtroAtual = 'dia';
-        let grafico = null;
+    let sessoes = [];
+    let disciplinas = [];
+    let filtroAtual = 'dia';
+    let grafico = null;
 
-        function filtrar(periodo, btn) {
-            filtroAtual = periodo;
-            document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
-            btn.classList.add('ativo');
-            renderizar();
+    async function carregar() {
+        const [rSessoes, rDisciplinas] = await Promise.all([
+            fetch('/api/sessoes'),
+            fetch('/api/disciplinas')
+        ]);
+        sessoes = await rSessoes.json();
+        disciplinas = await rDisciplinas.json();
+        renderizar();
+    }
+
+    function filtrar(periodo, btn) {
+        filtroAtual = periodo;
+        document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
+        btn.classList.add('ativo');
+        renderizar();
+    }
+
+    function obterIntervalo(periodo) {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        if (periodo === 'dia') {
+            return { inicio: hoje, fim: new Date(hoje.getTime() + 86400000) };
+        }
+        if (periodo === 'semana') {
+            const inicio = new Date(hoje);
+            inicio.setDate(hoje.getDate() - hoje.getDay());
+            const fim = new Date(inicio);
+            fim.setDate(inicio.getDate() + 7);
+            return { inicio, fim };
+        }
+        if (periodo === 'mes') {
+            const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
+            return { inicio, fim };
+        }
+    }
+
+    function filtrarSessoes(periodo) {
+        const { inicio, fim } = obterIntervalo(periodo);
+        return sessoes.filter(s => {
+            const data = new Date(s.data + 'T00:00:00');
+            return data >= inicio && data < fim;
+        });
+    }
+
+    function agruparPorDisciplina(sessoesFiltradas) {
+        const mapa = {};
+        sessoesFiltradas.forEach(s => {
+            if (!mapa[s.disciplina]) mapa[s.disciplina] = { sessoes: 0, minutos: 0 };
+            mapa[s.disciplina].sessoes++;
+            mapa[s.disciplina].minutos += (s.horas * 60) + s.minutos;
+        });
+        return mapa;
+    }
+
+    function formatarTempo(minutos) {
+        const h = Math.floor(minutos / 60);
+        const m = minutos % 60;
+        if (h > 0 && m > 0) return `${h}h ${m}min`;
+        if (h > 0) return `${h}h`;
+        return `${m}min`;
+    }
+
+    function renderizar() {
+        const sessoesFiltradas = filtrarSessoes(filtroAtual);
+        const agrupado = agruparPorDisciplina(sessoesFiltradas);
+        const labels = Object.keys(agrupado);
+
+        const totalMinutos = Object.values(agrupado).reduce((acc, d) => acc + d.minutos, 0);
+        document.getElementById('total-horas').textContent = formatarTempo(totalMinutos);
+
+        const vazioGrafico = document.getElementById('vazio-grafico');
+        const vazioTabela = document.getElementById('vazio-tabela');
+
+        if (labels.length === 0) {
+            vazioGrafico.style.display = 'block';
+            vazioTabela.style.display = 'block';
+            if (grafico) { grafico.destroy(); grafico = null; }
+            document.getElementById('tabela-resumo').innerHTML = '';
+            return;
         }
 
-        function obterIntervalo(periodo) {
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
+        vazioGrafico.style.display = 'none';
+        vazioTabela.style.display = 'none';
 
-            if (periodo === 'dia') {
-                return { inicio: hoje, fim: new Date(hoje.getTime() + 86400000) };
-            }
+        const cores = labels.map(l => {
+            const disc = disciplinas.find(d => d.nome === l);
+            return disc ? disc.cor : '#093952';
+        });
 
-            if (periodo === 'semana') {
-                const diaSemana = hoje.getDay();
-                const inicio = new Date(hoje);
-                inicio.setDate(hoje.getDate() - diaSemana);
-                const fim = new Date(inicio);
-                fim.setDate(inicio.getDate() + 7);
-                return { inicio, fim };
-            }
+        const ctx = document.getElementById('grafico').getContext('2d');
+        if (grafico) grafico.destroy();
 
-            if (periodo === 'mes') {
-                const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-                const fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1);
-                return { inicio, fim };
-            }
-        }
-
-        function filtrarSessoes(periodo) {
-            const { inicio, fim } = obterIntervalo(periodo);
-            return sessoes.filter(s => {
-                const data = new Date(s.data + 'T00:00:00');
-                return data >= inicio && data < fim;
-            });
-        }
-
-        function agruparPorDisciplina(sessoesFiltradas) {
-            const mapa = {};
-            sessoesFiltradas.forEach(s => {
-                if (!mapa[s.disciplina]) mapa[s.disciplina] = { sessoes: 0, minutos: 0 };
-                mapa[s.disciplina].sessoes++;
-                mapa[s.disciplina].minutos += (s.horas * 60) + s.minutos;
-            });
-            return mapa;
-        }
-
-        function formatarTempo(minutos) {
-            const h = Math.floor(minutos / 60);
-            const m = minutos % 60;
-            if (h > 0 && m > 0) return `${h}h ${m}min`;
-            if (h > 0) return `${h}h`;
-            return `${m}min`;
-        }
-
-        function renderizar() {
-            const sessoesFiltradas = filtrarSessoes(filtroAtual);
-            const agrupado = agruparPorDisciplina(sessoesFiltradas);
-            const disciplinas = Object.keys(agrupado);
-
-            // TOTAL
-            const totalMinutos = Object.values(agrupado).reduce((acc, d) => acc + d.minutos, 0);
-            document.getElementById('total-horas').textContent = formatarTempo(totalMinutos);
-
-            const vazioGrafico = document.getElementById('vazio-grafico');
-            const vazioTabela = document.getElementById('vazio-tabela');
-
-            if (disciplinas.length === 0) {
-                vazioGrafico.style.display = 'block';
-                vazioTabela.style.display = 'block';
-                if (grafico) { grafico.destroy(); grafico = null; }
-                document.getElementById('tabela-resumo').innerHTML = '';
-                return;
-            }
-
-            vazioGrafico.style.display = 'none';
-            vazioTabela.style.display = 'none';
-
-            // GRÁFICO
-            const ctx = document.getElementById('grafico').getContext('2d');
-            if (grafico) grafico.destroy();
-
-            grafico = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: disciplinas,
-                    datasets: [{
-                        label: 'Horas estudadas',
-                        data: disciplinas.map(d => +(agrupado[d].minutos / 60).toFixed(2)),
-                        backgroundColor: '#093952',
-                        borderRadius: 8,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => formatarTempo(Math.round(ctx.raw * 60))
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: val => `${val}h`,
-                                font: { family: 'League Spartan' }
-                            },
-                            grid: { color: '#e0e0e0' }
-                        },
-                        x: {
-                            ticks: { font: { family: 'League Spartan' } },
-                            grid: { display: false }
+        grafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Horas estudadas',
+                    data: labels.map(l => +(agrupado[l].minutos / 60).toFixed(2)),
+                    backgroundColor: cores,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => formatarTempo(Math.round(ctx.raw * 60))
                         }
                     }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: val => `${val}h`,
+                            font: { family: 'League Spartan' }
+                        },
+                        grid: { color: '#e0e0e0' }
+                    },
+                    x: {
+                        ticks: { font: { family: 'League Spartan' } },
+                        grid: { display: false }
+                    }
                 }
-            });
+            }
+        });
 
-            // TABELA
-            const tbody = document.getElementById('tabela-resumo');
-            tbody.innerHTML = '';
-            disciplinas.forEach(d => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${d}</td>
-                    <td>${agrupado[d].sessoes}</td>
-                    <td>${formatarTempo(agrupado[d].minutos)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+        const tbody = document.getElementById('tabela-resumo');
+        tbody.innerHTML = '';
+        labels.forEach(l => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${l}</td>
+                <td>${agrupado[l].sessoes}</td>
+                <td>${formatarTempo(agrupado[l].minutos)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
-        lucide.createIcons();
-        renderizar();
-    </script>
+    lucide.createIcons();
+    carregar();
+</script>
 
 {% endblock %}

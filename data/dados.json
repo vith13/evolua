@@ -1,28 +1,18 @@
 {
-    "disciplinas": [
+    "usuarios": [
         {
-            "nome": "Matem\u00e1tica"
+            "nome": "EMILLY Vi",
+            "email": "evsa@ic.ufal.br",
+            "senha": "scrypt:32768:8:1$HTK23l1Z5yi3XjsF$c81078ce990d87e256a07132ea4be24bb080b0a7421c0efca419515711e7591f24628ba258aa359230195a110739eb2f5bbddd52f497ccb9bf1e54f637046474"
         },
         {
-            "nome": "calculo"
+            "nome": "vith",
+            "email": "vithstna2@gmail.com",
+            "senha": "scrypt:32768:8:1$uIvOxeSjwCBBXWJS$75ab508166d5e991f0e747c1ef5015b8ee76545f7fbdfe9a22a90b23afddae563e71a81d794b33b2e0882aacc4741f3021fd1445f6f3c226915b2fe1699d8750"
         }
     ],
-    "sessoes": [
-        {
-            "disciplina": "Matem\u00e1tica",
-            "duracao": 60,
-            "data": "2026-04-01"
-        },
-        {
-            "disciplina": "calculo",
-            "duracao": 1,
-            "data": "2026-04-07"
-        }
-    ],
-    "tarefas": [
-        {
-            "tarefa": "estudar",
-            "concluida": false
-        }
-    ]
+    "disciplinas": [],
+    "sessoes": [],
+    "tarefas": [],
+    "eventos": {}
 }

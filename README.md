@@ -43,13 +43,116 @@ O **Evolua** é uma aplicação web minimalista para gestão de estudos, desenvo
 
 ## 🧠 Conceitos de POO aplicados
 
-| Conceito | Onde foi aplicado |
-|---|---|
-| **Classe** | `Entidade`, `Disciplina`, `Tarefa`, `Sessao`, `Usuario`, `Relatorio` |
-| **Herança** | `Disciplina`, `Tarefa`, `Sessao`, `SessaoFoco`, `Evento` herdam de `ItemEstudo` |
-| **Abstrato** | `ItemEstudo` é abstrata com métodos `to_dict()` e `resumo()` obrigatórios |
-| **Polimorfismo** | `resumo()` se comporta diferente em `Sessao`, `SessaoFoco`, `Tarefa` e `Evento` |
-| **Overloading** | `Relatorio.gerar()` aceita parâmetros opcionais `periodo` e `disciplina` |
+Todos os conceitos estão implementados em `models/models.py` e utilizados em `services/sistema.py`.
+
+---
+
+### 🔷 Classe Abstrata
+
+A classe `ItemEstudo` é a base abstrata do sistema. Por ser abstrata (usando `ABC` do Python), ela **não pode ser instanciada diretamente** — serve apenas como modelo para as subclasses.
+
+Ela define dois métodos abstratos obrigatórios que toda subclasse deve implementar:
+
+```python
+class ItemEstudo(ABC):
+    @abstractmethod
+    def to_dict(self) -> dict:
+        pass
+
+    @abstractmethod
+    def resumo(self) -> str:
+        pass
+```
+
+---
+
+### 🔷 Herança
+
+As classes `Disciplina`, `Tarefa`, `Sessao`, `SessaoFoco` e `Evento` herdam de `ItemEstudo`, reaproveitando seus atributos (`nome`, `criado_em`) e sendo obrigadas a implementar `to_dict()` e `resumo()`.
+
+`SessaoFoco` vai além e herda de `Sessao`, que já herda de `ItemEstudo` — demonstrando herança em dois níveis:
+
+```python
+class Sessao(ItemEstudo):       # herda de ItemEstudo
+    ...
+
+class SessaoFoco(Sessao):       # herda de Sessao → herança em cadeia
+    ...
+```
+
+---
+
+### 🔷 Polimorfismo
+
+O método `resumo()` é implementado de forma diferente em cada subclasse. O mesmo método, chamado em objetos de tipos diferentes, produz respostas distintas.
+
+Isso é invocado em `services/sistema.py` na função `registrar_sessao()`:
+
+```python
+def registrar_sessao(self, disciplina, horas, minutos, data=None, foco=False):
+    if foco:
+        sessao = SessaoFoco("Sessão Foco", disciplina, horas, minutos, data)
+    else:
+        sessao = Sessao("Sessão", disciplina, horas, minutos, data)
+
+    # POLIMORFISMO — mesmo método, comportamento diferente por tipo de objeto
+    print(f"[POLIMORFISMO] {sessao.resumo()}")
+```
+
+Saída ao registrar uma **sessão normal**:
+```
+[POLIMORFISMO] Sessão: Matemática | 1h 30min | 2026-04-23
+```
+
+Saída ao registrar uma **sessão de foco (Pomodoro)**:
+```
+[POLIMORFISMO] Sessão Foco: Matemática | 0h 25min | 2026-04-23 🎯
+```
+
+Outros exemplos de `resumo()` polimórfico:
+
+```python
+Tarefa("Estudar Flask").resumo()
+# → "Tarefa: Estudar Flask [❌ Pendente]"
+
+Disciplina("Matemática", "#093952").resumo()
+# → "Disciplina: Matemática (cor: #093952)"
+
+Evento("Prova Final", "2026-04-30", "Cálculo").resumo()
+# → "Compromisso: Prova Final (Cálculo) | 2026-04-30"
+```
+
+---
+
+### 🔷 Overloading
+
+Em Python, o overloading é feito com parâmetros opcionais. O método `gerar()` da classe `Relatorio` funciona de formas diferentes dependendo dos argumentos passados:
+
+```python
+class Relatorio:
+    def gerar(self, periodo: str = "semana", disciplina: str = None) -> dict:
+        ...
+```
+
+Pode ser chamado de três formas:
+
+```python
+relatorio.gerar()                          # relatório semanal, todas as disciplinas
+relatorio.gerar("mes")                     # relatório mensal, todas as disciplinas
+relatorio.gerar("dia", "Matemática")       # relatório diário, só Matemática
+```
+
+---
+
+### Resumo visual
+
+| Conceito | Arquivo | Onde |
+|---|---|---|
+| **Classe abstrata** | `models/models.py` | Classe `ItemEstudo` com `@abstractmethod` |
+| **Herança simples** | `models/models.py` | `Disciplina`, `Tarefa`, `Sessao`, `Evento` → `ItemEstudo` |
+| **Herança em cadeia** | `models/models.py` | `SessaoFoco` → `Sessao` → `ItemEstudo` |
+| **Polimorfismo** | `models/models.py` + `services/sistema.py` | Método `resumo()` com comportamentos distintos, invocado em `registrar_sessao()` |
+| **Overloading** | `models/models.py` | `Relatorio.gerar()` com parâmetros opcionais |
 
 ---
 
@@ -98,7 +201,7 @@ projeto_software/
 │
 ├── app.py
 ├── backend.py
-├── .env              
+├── .env              ← NÃO suba para o GitHub
 ├── .gitignore
 └── README.md
 ```

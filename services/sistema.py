@@ -85,6 +85,11 @@ class SistemaEstudos:
             sessao = SessaoFoco("Sessão Foco", disciplina, horas, minutos, data)
         else:
             sessao = Sessao("Sessão", disciplina, horas, minutos, data)
+
+    # POLIMORFISMO — resumo() é chamado no mesmo objeto mas responde diferente
+    # dependendo se é Sessao ou SessaoFoco
+        print(f"[POLIMORFISMO] {sessao.resumo()}")
+
         self.dados["sessoes"].append(sessao.to_dict())
         self._salvar()
         return {"sucesso": "Sessão registrada!", "sessao": sessao.to_dict()}

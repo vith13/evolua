@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 # ============================================================
-# CLASSE ABSTRATA BASE — todos os itens do sistema herdam dela
+# CLASSE ABSTRATA BASE — todos os itens herdam dela
 # ============================================================
 class ItemEstudo(ABC):
     """Classe abstrata que representa qualquer item do sistema."""
@@ -26,9 +26,8 @@ class ItemEstudo(ABC):
         return f"{self.__class__.__name__}: {self.nome}"
 
 
-# ============================================================
 # HERANÇA — classes filhas que herdam de ItemEstudo
-# ============================================================
+
 class Disciplina(ItemEstudo):
     """Representa uma disciplina de estudo."""
 

@@ -1,18 +1,41 @@
 {
     "usuarios": [
         {
-            "nome": "EMILLY Vi",
-            "email": "evsa@ic.ufal.br",
-            "senha": "scrypt:32768:8:1$HTK23l1Z5yi3XjsF$c81078ce990d87e256a07132ea4be24bb080b0a7421c0efca419515711e7591f24628ba258aa359230195a110739eb2f5bbddd52f497ccb9bf1e54f637046474"
-        },
-        {
-            "nome": "vith",
+            "nome": "emily",
             "email": "vithstna2@gmail.com",
-            "senha": "scrypt:32768:8:1$uIvOxeSjwCBBXWJS$75ab508166d5e991f0e747c1ef5015b8ee76545f7fbdfe9a22a90b23afddae563e71a81d794b33b2e0882aacc4741f3021fd1445f6f3c226915b2fe1699d8750"
+            "senha": "scrypt:32768:8:1$MjezDd9s8K4Cnx8k$4b585c377d1e77ac8df7001dc98b785540290eeb47273e7ea217d1022d56bc20fa29d7277d9453ac27a0243f0b3b386c2b64fa97da5e402fed7057c11cd97c6b"
         }
     ],
-    "disciplinas": [],
-    "sessoes": [],
-    "tarefas": [],
-    "eventos": {}
+    "disciplinas": [
+        {
+            "nome": "c1",
+            "cor": "#E07A5F",
+            "criado_em": "2026-04-29"
+        }
+    ],
+    "sessoes": [
+        {
+            "nome": "Sessão",
+            "disciplina": "c1",
+            "horas": 1,
+            "minutos": 0,
+            "data": "2026-04-29"
+        }
+    ],
+    "tarefas": [
+        {
+            "nome": "lkdjflksd",
+            "concluida": false,
+            "criado_em": "2026-04-29"
+        }
+    ],
+    "eventos": {
+        "2026-04-29": [
+            {
+                "texto": "jkklfja",
+                "data": "2026-04-29",
+                "disciplina": ""
+            }
+        ]
+    }
 }
